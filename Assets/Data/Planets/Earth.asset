@@ -16,3 +16,4 @@ MonoBehaviour:
   orbitalRadiusAU: 1
   orbitalPeriodDays: 365.25
   startingAngleDegrees: 0
+  visualDiameter: 10
