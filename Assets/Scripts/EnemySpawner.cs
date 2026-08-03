@@ -5,7 +5,7 @@ public class EnemySpawner : MonoBehaviour
     public GameObject enemyPrefab;
     public Transform stimulus;
     public int spawnCount = 20;
-    public float spawnRadius = 5f;
+    public float spawnRadius = 15f;
 
     void Start()
     {

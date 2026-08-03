@@ -242,8 +242,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EnemySpawner
   enemyPrefab: {fileID: 6765103592013095223, guid: bb48000d4e99c83428415d4b4afb369f, type: 3}
   stimulus: {fileID: 1529798356}
-  spawnCount: 20000
-  spawnRadius: 30
+  spawnCount: 30000
+  spawnRadius: 100
 --- !u!4 &900720531
 Transform:
   m_ObjectHideFlags: 0
@@ -254,7 +254,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 1, y: 1.825, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
