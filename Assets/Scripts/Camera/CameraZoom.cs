@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections;
 
 public class CameraZoom : MonoBehaviour
 {
@@ -8,12 +9,18 @@ public class CameraZoom : MonoBehaviour
     public float maxZoom = 4000f;
 
     [Header("Pan (arrastar com o botão do meio)")]
-    public int panMouseButton = 2; // 0 = esquerdo, 1 = direito, 2 = meio
+    public int panMouseButton = 2;
+
+    [Header("Foco em planeta (clique)")]
+    public Transform referencePlanet; // arraste o objeto Jupiter aqui
+    public float zoomPadding = 1.6f;  // margem extra ao redor do diâmetro de referência
+    public float focusTransitionDuration = 1f;
 
     private Camera cam;
     private Vector3 dragOrigin;
     private bool isDragging;
     private Transform followTarget;
+    private OrbitalBody hoveredBody;
 
     void Start()
     {
@@ -23,7 +30,8 @@ public class CameraZoom : MonoBehaviour
     void Update()
     {
         HandleZoom();
-        HandleClickToFollow();
+        HandleHover();
+        HandleClick();
         HandlePan();
         HandleFollow();
     }
@@ -42,8 +50,90 @@ public class CameraZoom : MonoBehaviour
     Vector3 GetMouseWorldPosition()
     {
         Vector3 mouseScreenPos = Input.mousePosition;
-        mouseScreenPos.z = Mathf.Abs(transform.position.z); // distância da câmera até o plano do jogo
+        mouseScreenPos.z = Mathf.Abs(transform.position.z);
         return cam.ScreenToWorldPoint(mouseScreenPos);
+    }
+
+    OrbitalBody FindClosestBodyToMouse()
+    {
+        Vector3 mouseWorldPos = GetMouseWorldPosition();
+        OrbitalBody[] allBodies = FindObjectsOfType<OrbitalBody>();
+
+        OrbitalBody closest = null;
+        float closestDistance = Mathf.Infinity;
+
+        foreach (OrbitalBody body in allBodies)
+        {
+            float distance = Vector3.Distance(mouseWorldPos, body.transform.position);
+            float tolerance = Mathf.Max(body.transform.localScale.x * 0.6f, cam.orthographicSize * 0.02f);
+
+            if (distance < tolerance && distance < closestDistance)
+            {
+                closest = body;
+                closestDistance = distance;
+            }
+        }
+
+        return closest;
+    }
+
+    void HandleHover()
+    {
+        OrbitalBody closest = FindClosestBodyToMouse();
+
+        if (closest != hoveredBody)
+        {
+            if (hoveredBody != null) hoveredBody.SetHighlighted(false);
+            hoveredBody = closest;
+            if (hoveredBody != null) hoveredBody.SetHighlighted(true);
+        }
+    }
+
+    void HandleClick()
+    {
+        if (Input.GetMouseButtonDown(0))
+        {
+            OrbitalBody closest = FindClosestBodyToMouse();
+            if (closest != null)
+            {
+                FocusOnPlanet(closest);
+            }
+        }
+    }
+
+    void FocusOnPlanet(OrbitalBody body)
+    {
+        followTarget = null;
+
+        float targetZoom = referencePlanet != null
+            ? referencePlanet.localScale.x * zoomPadding
+            : cam.orthographicSize;
+
+        targetZoom = Mathf.Clamp(targetZoom, minZoom, maxZoom);
+
+        StopAllCoroutines();
+        StartCoroutine(TransitionToPlanet(body.transform, targetZoom));
+    }
+
+    IEnumerator TransitionToPlanet(Transform target, float targetZoom)
+    {
+        float elapsed = 0f;
+        Vector3 startPos = transform.position;
+        float startZoom = cam.orthographicSize;
+
+        while (elapsed < focusTransitionDuration)
+        {
+            elapsed += Time.deltaTime;
+            float tNorm = elapsed / focusTransitionDuration;
+
+            Vector3 targetPos = new Vector3(target.position.x, target.position.y, transform.position.z);
+            transform.position = Vector3.Lerp(startPos, targetPos, tNorm);
+            cam.orthographicSize = Mathf.Lerp(startZoom, targetZoom, tNorm);
+
+            yield return null;
+        }
+
+        followTarget = target;
     }
 
     void HandlePan()
@@ -52,7 +142,8 @@ public class CameraZoom : MonoBehaviour
         {
             dragOrigin = GetMouseWorldPosition();
             isDragging = true;
-            followTarget = null; // arrastar manualmente cancela o "seguir planeta"
+            followTarget = null;
+            StopAllCoroutines();
         }
 
         if (Input.GetMouseButton(panMouseButton) && isDragging)
@@ -64,38 +155,6 @@ public class CameraZoom : MonoBehaviour
         if (Input.GetMouseButtonUp(panMouseButton))
         {
             isDragging = false;
-        }
-    }
-
-    void HandleClickToFollow()
-    {
-        if (Input.GetMouseButtonDown(0))
-        {
-            Vector3 clickWorldPos = GetMouseWorldPosition();
-            OrbitalBody[] allBodies = FindObjectsOfType<OrbitalBody>();
-
-            OrbitalBody closest = null;
-            float closestDistance = Mathf.Infinity;
-
-            foreach (OrbitalBody body in allBodies)
-            {
-                float distance = Vector3.Distance(clickWorldPos, body.transform.position);
-
-                // Tolerância de clique: nunca menor que um valor mínimo (facilita acertar planetas pequenos),
-                // mas cresce com o zoom out, igual fizemos com a espessura da linha de órbita
-                float clickTolerance = Mathf.Max(body.transform.localScale.x * 0.6f, cam.orthographicSize * 0.02f);
-
-                if (distance < clickTolerance && distance < closestDistance)
-                {
-                    closest = body;
-                    closestDistance = distance;
-                }
-            }
-
-            if (closest != null)
-            {
-                followTarget = closest.transform;
-            }
         }
     }
 

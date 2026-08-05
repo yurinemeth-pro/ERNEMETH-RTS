@@ -13,7 +13,10 @@ MonoBehaviour:
   m_Name: Mercury
   m_EditorClassIdentifier: Assembly-CSharp::PlanetData
   planetName: 
-  orbitalRadiusAU: 1
-  orbitalPeriodDays: 365
+  orbitalRadiusAU: 0.39
+  orbitalPeriodDays: 88
   startingAngleDegrees: 0
-  visualDiameter: 1
+  visualDiameter: 3.8
+  realDiameterAU: 0.0000326
+  sphereResolution: 32
+  rotationPeriodHours: 24

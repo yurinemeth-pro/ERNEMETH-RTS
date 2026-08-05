@@ -13,7 +13,10 @@ MonoBehaviour:
   m_Name: Sun
   m_EditorClassIdentifier: Assembly-CSharp::PlanetData
   planetName: 
-  orbitalRadiusAU: 1
-  orbitalPeriodDays: 365
+  orbitalRadiusAU: 0
+  orbitalPeriodDays: 1
   startingAngleDegrees: 0
-  visualDiameter: 1
+  visualDiameter: 219.4
+  realDiameterAU: 0.0093
+  sphereResolution: 32
+  rotationPeriodHours: 24

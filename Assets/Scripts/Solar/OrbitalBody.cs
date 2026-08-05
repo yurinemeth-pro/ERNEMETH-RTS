@@ -8,10 +8,11 @@ public class OrbitalBody : MonoBehaviour
     public SolarSystemSettings settings;
 
     [Header("Linha de órbita")]
-    public float orbitLinePixelWidth = 2f; // espessura desejada NA TELA, em pixels aproximados
+    public float orbitLinePixelWidth = 2f;
 
     private LineRenderer orbitLine;
     private Camera mainCam;
+    private Renderer rend;
 
     void GenerateSphere(int resolution)
     {
@@ -30,7 +31,6 @@ public class OrbitalBody : MonoBehaviour
             {
                 float phi = x * 2 * Mathf.PI / lon;
 
-                // Eixo dos polos alinhado com Z (o eixo que a câmera enxerga de frente)
                 vertices[index] = new Vector3(
                     Mathf.Sin(theta) * Mathf.Cos(phi),
                     Mathf.Sin(theta) * Mathf.Sin(phi),
@@ -62,10 +62,12 @@ public class OrbitalBody : MonoBehaviour
 
         GetComponent<MeshFilter>().mesh = mesh;
     }
-    
+
     void Start()
     {
         GenerateSphere(data.sphereResolution);
+
+        rend = GetComponent<Renderer>();
 
         LineRenderer line = GetComponent<LineRenderer>();
         line.loop = true;
@@ -73,8 +75,6 @@ public class OrbitalBody : MonoBehaviour
         line.positionCount = 100;
 
         line.material = new Material(Shader.Find("Sprites/Default"));
-        line.startColor = Color.white;
-        line.endColor = Color.white;
 
         float radius = data.orbitalRadiusAU * settings.unitsPerAU;
         float diameter = settings.useRealisticScale
@@ -96,31 +96,46 @@ public class OrbitalBody : MonoBehaviour
     {
         if (data == null || clock == null) return;
 
-        // Dias decorridos desde o início da simulação
         double daysElapsed = (clock.CurrentDate - new System.DateTime(clock.startYear, clock.startMonth, clock.startDay)).TotalDays;
 
-        // Rotação em torno do próprio eixo
         float rotationDegreesPerDay = 360f / (data.rotationPeriodHours / 24f);
         float currentRotation = (float)(rotationDegreesPerDay * daysElapsed) % 360f;
         transform.rotation = Quaternion.Euler(0f, 0f, currentRotation);
 
-        // Quantos graus o planeta girou ao redor do Sol desde o início
         float degreesPerDay = 360f / data.orbitalPeriodDays;
         float currentAngle = data.startingAngleDegrees + (float)(degreesPerDay * daysElapsed);
         float angleRad = currentAngle * Mathf.Deg2Rad;
 
-        // Posição no plano orbital
         float x = Mathf.Cos(angleRad) * data.orbitalRadiusAU * settings.unitsPerAU;
         float y = Mathf.Sin(angleRad) * data.orbitalRadiusAU * settings.unitsPerAU;
 
         transform.position = new Vector3(x, y, 0f);
 
-        // Espessura da linha de órbita, compensando o zoom da câmera
         if (orbitLine != null && mainCam != null)
         {
             float width = orbitLinePixelWidth * mainCam.orthographicSize * 0.0015f;
             orbitLine.startWidth = width;
             orbitLine.endWidth = width;
+
+            Color lineColor = new Color(1f, 1f, 1f, settings.orbitLineOpacity);
+            orbitLine.startColor = lineColor;
+            orbitLine.endColor = lineColor;
+        }
+    }
+
+    // Chamado pelo CameraZoom quando o mouse passa perto/longe deste planeta
+    public void SetHighlighted(bool state)
+    {
+        if (rend == null) return;
+
+        if (state)
+        {
+            rend.material.EnableKeyword("_EMISSION");
+            rend.material.SetColor("_EmissionColor", data.highlightColor * 0.6f);
+        }
+        else
+        {
+            rend.material.SetColor("_EmissionColor", Color.black);
         }
     }
 }

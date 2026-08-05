@@ -17,3 +17,6 @@ MonoBehaviour:
   orbitalPeriodDays: 687
   startingAngleDegrees: 0
   visualDiameter: 5.3
+  realDiameterAU: 0.0000453
+  sphereResolution: 64
+  rotationPeriodHours: 24

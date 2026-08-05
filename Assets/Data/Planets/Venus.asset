@@ -13,7 +13,10 @@ MonoBehaviour:
   m_Name: Venus
   m_EditorClassIdentifier: Assembly-CSharp::PlanetData
   planetName: 
-  orbitalRadiusAU: 1
-  orbitalPeriodDays: 365
+  orbitalRadiusAU: 0.72
+  orbitalPeriodDays: 225
   startingAngleDegrees: 0
-  visualDiameter: 1
+  visualDiameter: 9.5
+  realDiameterAU: 0.0000809
+  sphereResolution: 32
+  rotationPeriodHours: 24

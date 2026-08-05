@@ -4,9 +4,12 @@ using UnityEngine;
 public class SolarSystemSettings : ScriptableObject
 {
     [Header("Escala de Distância (compressão)")]
-    [Tooltip("Quantas unidades do Unity representam 1 UA de distância real")]
-    public float unitsPerAU = 5f;
+    public float unitsPerAU = 100f;
 
     [Header("Modo de Escala")]
-    public bool useRealisticScale = false; // true = Hard Mode (proporções reais)
+    public bool useRealisticScale = false;
+
+    [Header("Linhas de Órbita")]
+    [Range(0f, 1f)]
+    public float orbitLineOpacity = 0.5f;
 }
