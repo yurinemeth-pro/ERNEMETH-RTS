@@ -10,13 +10,14 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7f03ff6b22e324349b3949bfea83f488, type: 3}
-  m_Name: Saturn
+  m_Name: Neptune
   m_EditorClassIdentifier: Assembly-CSharp::PlanetData
   planetName: 
-  orbitalRadiusAU: 9.58
-  orbitalPeriodDays: 10747
+  orbitalRadiusAU: 30.05
+  orbitalPeriodDays: 59800
   startingAngleDegrees: 0
-  visualDiameter: 91.4
-  realDiameterAU: 0.0007784
-  sphereResolution: 64
   rotationPeriodHours: 24
+  visualDiameter: 38.6
+  realDiameterAU: 0.0003292
+  sphereResolution: 64
+  highlightColor: {r: 0, g: 0.07324079, b: 0.8207547, a: 1}

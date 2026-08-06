@@ -27,7 +27,7 @@ public class GameClock : MonoBehaviour
         secondsElapsedSimTime += Time.deltaTime * timeScale;
         CurrentDate = simulationStart.AddSeconds(secondsElapsedSimTime);
 
-        Debug.Log(CurrentDate.ToString("dd/MM/yyyy HH:mm:ss"));
+        //Debug.Log(CurrentDate.ToString("dd/MM/yyyy HH:mm:ss"));
     }
 
     public void SetTimeScale(float newScale)

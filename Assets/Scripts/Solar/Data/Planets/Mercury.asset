@@ -12,11 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7f03ff6b22e324349b3949bfea83f488, type: 3}
   m_Name: Mercury
   m_EditorClassIdentifier: Assembly-CSharp::PlanetData
-  planetName: 
-  orbitalRadiusAU: 0.39
-  orbitalPeriodDays: 88
-  startingAngleDegrees: 0
+  bodyName: 
+  rotationPeriodHours: 24
   visualDiameter: 3.8
   realDiameterAU: 0.0000326
   sphereResolution: 32
-  rotationPeriodHours: 24
+  highlightColor: {r: 0.764151, g: 0.764151, b: 0.764151, a: 1}
+  rings: []
+  orbitalRadiusAU: 0.39
+  orbitalPeriodDays: 88
+  startingAngleDegrees: 0

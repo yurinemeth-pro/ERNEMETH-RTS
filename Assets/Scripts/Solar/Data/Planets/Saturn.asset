@@ -10,13 +10,19 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7f03ff6b22e324349b3949bfea83f488, type: 3}
-  m_Name: Venus
+  m_Name: Saturn
   m_EditorClassIdentifier: Assembly-CSharp::PlanetData
-  planetName: 
-  orbitalRadiusAU: 0.72
-  orbitalPeriodDays: 225
-  startingAngleDegrees: 0
-  visualDiameter: 9.5
-  realDiameterAU: 0.0000809
-  sphereResolution: 32
+  bodyName: 
   rotationPeriodHours: 24
+  visualDiameter: 91.4
+  realDiameterAU: 0.0007784
+  sphereResolution: 64
+  highlightColor: {r: 1, g: 0.85098046, b: 0.58431375, a: 1}
+  rings:
+  - innerRadiusAU: 0.6
+    outerRadiusAU: 1
+    color: {r: 0.6698113, g: 0.647038, b: 0.48340157, a: 0}
+    opacity: 1
+  orbitalRadiusAU: 9.58
+  orbitalPeriodDays: 10747
+  startingAngleDegrees: 0

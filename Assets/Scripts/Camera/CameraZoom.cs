@@ -3,8 +3,9 @@ using System.Collections;
 
 public class CameraZoom : MonoBehaviour
 {
-    [Header("Zoom (multiplicativo)")]
+    [Header("Zoom (multiplicativo, suave)")]
     public float zoomSpeed = 0.15f;
+    public float zoomSmoothSpeed = 8f; // maior = alcança o alvo mais rápido
     public float minZoom = 2f;
     public float maxZoom = 4000f;
 
@@ -12,11 +13,20 @@ public class CameraZoom : MonoBehaviour
     public int panMouseButton = 2;
 
     [Header("Foco em planeta (clique)")]
-    public Transform referencePlanet; // arraste o objeto Jupiter aqui
-    public float zoomPadding = 1.6f;  // margem extra ao redor do diâmetro de referência
+    public Transform referencePlanet;
+    public float zoomPadding = 1.6f;
     public float focusTransitionDuration = 1f;
 
+    [Header("Tolerância de clique/hover (ajustável)")]
+    public float bodyToleranceMultiplier = 1.5f;   // proximidade do PRÓPRIO planeta
+    public float bodyMinTolerranceFactor = 0.09f;  // tolerância mínima, relativa ao zoom atual
+    public float ringToleranceFactor = 0.09f;      // proximidade da LINHA de órbita
+    public float ringMinTolerance = 0.6f;
+
     private Camera cam;
+    private float targetZoom;
+    private bool isTransitioning;
+
     private Vector3 dragOrigin;
     private bool isDragging;
     private Transform followTarget;
@@ -25,11 +35,13 @@ public class CameraZoom : MonoBehaviour
     void Start()
     {
         cam = GetComponent<Camera>();
+        targetZoom = cam.orthographicSize;
     }
 
     void Update()
     {
         HandleZoom();
+        ApplyZoomSmoothing();
         HandleHover();
         HandleClick();
         HandlePan();
@@ -42,9 +54,15 @@ public class CameraZoom : MonoBehaviour
         if (scrollInput != 0f)
         {
             float zoomFactor = 1f - (scrollInput * zoomSpeed * 10f);
-            cam.orthographicSize *= zoomFactor;
-            cam.orthographicSize = Mathf.Clamp(cam.orthographicSize, minZoom, maxZoom);
+            targetZoom *= zoomFactor;
+            targetZoom = Mathf.Clamp(targetZoom, minZoom, maxZoom);
         }
+    }
+
+    void ApplyZoomSmoothing()
+    {
+        if (isTransitioning) return; // durante o foco automático, a coroutine controla o zoom
+        cam.orthographicSize = Mathf.Lerp(cam.orthographicSize, targetZoom, Time.deltaTime * zoomSmoothSpeed);
     }
 
     Vector3 GetMouseWorldPosition()
@@ -60,17 +78,30 @@ public class CameraZoom : MonoBehaviour
         OrbitalBody[] allBodies = FindObjectsOfType<OrbitalBody>();
 
         OrbitalBody closest = null;
-        float closestDistance = Mathf.Infinity;
+        float closestScore = Mathf.Infinity;
+        float distToOrigin = Vector3.Distance(mouseWorldPos, Vector3.zero);
 
         foreach (OrbitalBody body in allBodies)
         {
-            float distance = Vector3.Distance(mouseWorldPos, body.transform.position);
-            float tolerance = Mathf.Max(body.transform.localScale.x * 0.6f, cam.orthographicSize * 0.02f);
+            float bodyDistance = Vector3.Distance(mouseWorldPos, body.transform.position);
+            float bodyTolerance = Mathf.Max(body.transform.localScale.x * bodyToleranceMultiplier, cam.orthographicSize * bodyMinTolerranceFactor);
 
-            if (distance < tolerance && distance < closestDistance)
+            if (bodyDistance < bodyTolerance && bodyDistance < closestScore)
             {
                 closest = body;
-                closestDistance = distance;
+                closestScore = bodyDistance;
+            }
+
+            if (body.OrbitRadiusWorld > 0f)
+            {
+                float ringDistance = Mathf.Abs(distToOrigin - body.OrbitRadiusWorld);
+                float ringTolerance = Mathf.Max(cam.orthographicSize * ringToleranceFactor, ringMinTolerance);
+
+                if (ringDistance < ringTolerance && ringDistance < closestScore)
+                {
+                    closest = body;
+                    closestScore = ringDistance;
+                }
             }
         }
 
@@ -105,18 +136,21 @@ public class CameraZoom : MonoBehaviour
     {
         followTarget = null;
 
-        float targetZoom = referencePlanet != null
+        float focusZoom = referencePlanet != null
             ? referencePlanet.localScale.x * zoomPadding
             : cam.orthographicSize;
 
-        targetZoom = Mathf.Clamp(targetZoom, minZoom, maxZoom);
+        focusZoom = Mathf.Clamp(focusZoom, minZoom, maxZoom);
+        targetZoom = focusZoom;
 
         StopAllCoroutines();
-        StartCoroutine(TransitionToPlanet(body.transform, targetZoom));
+        StartCoroutine(TransitionToPlanet(body.transform, focusZoom));
     }
 
-    IEnumerator TransitionToPlanet(Transform target, float targetZoom)
+    IEnumerator TransitionToPlanet(Transform target, float targetZoomValue)
     {
+        isTransitioning = true;
+
         float elapsed = 0f;
         Vector3 startPos = transform.position;
         float startZoom = cam.orthographicSize;
@@ -128,11 +162,12 @@ public class CameraZoom : MonoBehaviour
 
             Vector3 targetPos = new Vector3(target.position.x, target.position.y, transform.position.z);
             transform.position = Vector3.Lerp(startPos, targetPos, tNorm);
-            cam.orthographicSize = Mathf.Lerp(startZoom, targetZoom, tNorm);
+            cam.orthographicSize = Mathf.Lerp(startZoom, targetZoomValue, tNorm);
 
             yield return null;
         }
 
+        isTransitioning = false;
         followTarget = target;
     }
 
@@ -144,6 +179,7 @@ public class CameraZoom : MonoBehaviour
             isDragging = true;
             followTarget = null;
             StopAllCoroutines();
+            isTransitioning = false;
         }
 
         if (Input.GetMouseButton(panMouseButton) && isDragging)

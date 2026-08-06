@@ -119,6 +119,140 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &638485971
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 638485976}
+  - component: {fileID: 638485975}
+  - component: {fileID: 638485974}
+  - component: {fileID: 638485973}
+  - component: {fileID: 638485972}
+  m_Layer: 0
+  m_Name: Moon
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &638485972
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 638485971}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3aa2d7579f0ef37469236a2eb7d0fb9b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::OrbitalBody
+  data: {fileID: 11400000, guid: d759657adb4247e46bdd48960f58a6a4, type: 2}
+  clock: {fileID: 2029327207}
+  settings: {fileID: 11400000, guid: e9342a9252ed37943a0ac6ce6de1bc80, type: 2}
+  orbitCenter: {fileID: 1471425527}
+  orbitLinePixelWidth: 2
+  orbitSegments: 200
+  orbitHighlightPixelWidth: 5
+  highlightFadeSpeed: 4
+  markerPixelSize: 30
+--- !u!135 &638485973
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 638485971}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Radius: 0.5
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!23 &638485974
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 638485971}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: a9099a20bf8d1b04aaf4b9922670faa7, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_MaskInteraction: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!33 &638485975
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 638485971}
+  m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!4 &638485976
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 638485971}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 4.002, y: 1.298, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &883238115
 GameObject:
   m_ObjectHideFlags: 0
@@ -155,7 +289,12 @@ MonoBehaviour:
   data: {fileID: 11400000, guid: c46eb6dbadf04da4ebc094228257c891, type: 2}
   clock: {fileID: 2029327207}
   settings: {fileID: 11400000, guid: e9342a9252ed37943a0ac6ce6de1bc80, type: 2}
+  orbitCenter: {fileID: 1070114366}
   orbitLinePixelWidth: 2
+  orbitSegments: 200
+  orbitHighlightPixelWidth: 5
+  highlightFadeSpeed: 4
+  markerPixelSize: 30
 --- !u!120 &883238117
 LineRenderer:
   serializedVersion: 3
@@ -395,7 +534,12 @@ MonoBehaviour:
   data: {fileID: 11400000, guid: a02b7820695ea7349b090a4b0898d030, type: 2}
   clock: {fileID: 2029327207}
   settings: {fileID: 11400000, guid: e9342a9252ed37943a0ac6ce6de1bc80, type: 2}
+  orbitCenter: {fileID: 1070114366}
   orbitLinePixelWidth: 2
+  orbitSegments: 200
+  orbitHighlightPixelWidth: 5
+  highlightFadeSpeed: 4
+  markerPixelSize: 30
 --- !u!120 &914059538
 LineRenderer:
   serializedVersion: 3
@@ -631,7 +775,7 @@ Light:
   m_Enabled: 1
   serializedVersion: 13
   m_Type: 2
-  m_Color: {r: 1, g: 0.9573416, b: 0.8160377, a: 1}
+  m_Color: {r: 1, g: 0.89989096, b: 0.6839622, a: 1}
   m_Intensity: 15
   m_Range: 1e+10
   m_SpotAngle: 30
@@ -671,7 +815,7 @@ Light:
     serializedVersion: 2
     m_Bits: 4294967295
   m_RenderingLayerMask: 1
-  m_Lightmapping: 4
+  m_Lightmapping: 2
   m_LightShadowCasterMode: 0
   m_AreaSize: {x: 1, y: 1}
   m_BounceIntensity: 1
@@ -701,7 +845,12 @@ MonoBehaviour:
   data: {fileID: 11400000, guid: 6948d7be60c35944d839969adbe24d90, type: 2}
   clock: {fileID: 2029327207}
   settings: {fileID: 11400000, guid: e9342a9252ed37943a0ac6ce6de1bc80, type: 2}
+  orbitCenter: {fileID: 0}
   orbitLinePixelWidth: 2
+  orbitSegments: 200
+  orbitHighlightPixelWidth: 5
+  highlightFadeSpeed: 4
+  markerPixelSize: 30
 --- !u!120 &1070114362
 LineRenderer:
   serializedVersion: 3
@@ -858,7 +1007,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: e5ee1c445314ac845aeda1b276cfe885, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -941,7 +1090,12 @@ MonoBehaviour:
   data: {fileID: 11400000, guid: a4cc2df3687ba3d4fb4156d0c8f4e29e, type: 2}
   clock: {fileID: 2029327207}
   settings: {fileID: 11400000, guid: e9342a9252ed37943a0ac6ce6de1bc80, type: 2}
+  orbitCenter: {fileID: 1070114366}
   orbitLinePixelWidth: 2
+  orbitSegments: 200
+  orbitHighlightPixelWidth: 5
+  highlightFadeSpeed: 4
+  markerPixelSize: 30
 --- !u!120 &1202492252
 LineRenderer:
   serializedVersion: 3
@@ -1181,7 +1335,12 @@ MonoBehaviour:
   data: {fileID: 11400000, guid: 2637ebec69126f34989426e02093c1d5, type: 2}
   clock: {fileID: 2029327207}
   settings: {fileID: 11400000, guid: e9342a9252ed37943a0ac6ce6de1bc80, type: 2}
+  orbitCenter: {fileID: 1070114366}
   orbitLinePixelWidth: 2
+  orbitSegments: 200
+  orbitHighlightPixelWidth: 5
+  highlightFadeSpeed: 4
+  markerPixelSize: 30
 --- !u!135 &1471425524
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -1421,7 +1580,12 @@ MonoBehaviour:
   data: {fileID: 11400000, guid: eb628e4bd67e54e4ca394dc76537a970, type: 2}
   clock: {fileID: 2029327207}
   settings: {fileID: 11400000, guid: e9342a9252ed37943a0ac6ce6de1bc80, type: 2}
+  orbitCenter: {fileID: 1070114366}
   orbitLinePixelWidth: 2
+  orbitSegments: 200
+  orbitHighlightPixelWidth: 5
+  highlightFadeSpeed: 4
+  markerPixelSize: 30
 --- !u!135 &1612805150
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -1731,9 +1895,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CameraZoom
   zoomSpeed: 0.15
+  zoomSmoothSpeed: 8
   minZoom: 2
   maxZoom: 400000
   panMouseButton: 2
+  referencePlanet: {fileID: 1873160855}
+  zoomPadding: 0.6
+  focusTransitionDuration: 1
+  bodyToleranceMultiplier: 1.2
+  bodyMinTolerranceFactor: 0.04
+  ringToleranceFactor: 0.03
+  ringMinTolerance: 0.6
 --- !u!1 &1873160850
 GameObject:
   m_ObjectHideFlags: 0
@@ -1770,7 +1942,12 @@ MonoBehaviour:
   data: {fileID: 11400000, guid: 355fb327a31e12a4db43dd50ad0028f2, type: 2}
   clock: {fileID: 2029327207}
   settings: {fileID: 11400000, guid: e9342a9252ed37943a0ac6ce6de1bc80, type: 2}
+  orbitCenter: {fileID: 1070114366}
   orbitLinePixelWidth: 2
+  orbitSegments: 200
+  orbitHighlightPixelWidth: 5
+  highlightFadeSpeed: 4
+  markerPixelSize: 30
 --- !u!135 &1873160852
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -2006,7 +2183,7 @@ MonoBehaviour:
   startYear: 1989
   startMonth: 8
   startDay: 25
-  timeScale: 5000
+  timeScale: 50000
 --- !u!4 &2029327208
 Transform:
   m_ObjectHideFlags: 0
@@ -2058,7 +2235,12 @@ MonoBehaviour:
   data: {fileID: 11400000, guid: 5aa21167374422b40a7eda524f52a750, type: 2}
   clock: {fileID: 2029327207}
   settings: {fileID: 11400000, guid: e9342a9252ed37943a0ac6ce6de1bc80, type: 2}
+  orbitCenter: {fileID: 1070114366}
   orbitLinePixelWidth: 2
+  orbitSegments: 200
+  orbitHighlightPixelWidth: 5
+  highlightFadeSpeed: 4
+  markerPixelSize: 30
 --- !u!120 &2077489001
 LineRenderer:
   serializedVersion: 3
@@ -2298,7 +2480,12 @@ MonoBehaviour:
   data: {fileID: 11400000, guid: fe4fdd83f5bde294eb44b69cb36be0b1, type: 2}
   clock: {fileID: 2029327207}
   settings: {fileID: 11400000, guid: e9342a9252ed37943a0ac6ce6de1bc80, type: 2}
+  orbitCenter: {fileID: 1070114366}
   orbitLinePixelWidth: 2
+  orbitSegments: 200
+  orbitHighlightPixelWidth: 5
+  highlightFadeSpeed: 4
+  markerPixelSize: 30
 --- !u!120 &2087123452
 LineRenderer:
   serializedVersion: 3
@@ -2517,3 +2704,4 @@ SceneRoots:
   - {fileID: 914059542}
   - {fileID: 2087123456}
   - {fileID: 1070114366}
+  - {fileID: 638485976}

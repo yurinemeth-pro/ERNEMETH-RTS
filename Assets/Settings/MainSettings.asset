@@ -12,5 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 046749139b5115a4294e3f608219ff10, type: 3}
   m_Name: MainSettings
   m_EditorClassIdentifier: Assembly-CSharp::SolarSystemSettings
-  unitsPerAU: 1000
+  unitsPerAU: 1200
   useRealisticScale: 0
+  orbitLineOpacity: 0.02
