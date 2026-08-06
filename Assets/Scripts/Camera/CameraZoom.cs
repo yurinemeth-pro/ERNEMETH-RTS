@@ -5,7 +5,7 @@ public class CameraZoom : MonoBehaviour
 {
     [Header("Zoom (multiplicativo, suave)")]
     public float zoomSpeed = 0.15f;
-    public float zoomSmoothSpeed = 8f; // maior = alcança o alvo mais rápido
+    public float zoomSmoothSpeed = 8f;
     public float minZoom = 2f;
     public float maxZoom = 4000f;
 
@@ -18,9 +18,9 @@ public class CameraZoom : MonoBehaviour
     public float focusTransitionDuration = 1f;
 
     [Header("Tolerância de clique/hover (ajustável)")]
-    public float bodyToleranceMultiplier = 1.5f;   // proximidade do PRÓPRIO planeta
-    public float bodyMinTolerranceFactor = 0.09f;  // tolerância mínima, relativa ao zoom atual
-    public float ringToleranceFactor = 0.09f;      // proximidade da LINHA de órbita
+    public float bodyToleranceMultiplier = 1.2f;
+    public float bodyMinTolerranceFactor = 0.04f;
+    public float ringToleranceFactor = 0.03f;
     public float ringMinTolerance = 0.6f;
 
     private Camera cam;
@@ -61,7 +61,7 @@ public class CameraZoom : MonoBehaviour
 
     void ApplyZoomSmoothing()
     {
-        if (isTransitioning) return; // durante o foco automático, a coroutine controla o zoom
+        if (isTransitioning) return;
         cam.orthographicSize = Mathf.Lerp(cam.orthographicSize, targetZoom, Time.deltaTime * zoomSmoothSpeed);
     }
 
@@ -79,7 +79,6 @@ public class CameraZoom : MonoBehaviour
 
         OrbitalBody closest = null;
         float closestScore = Mathf.Infinity;
-        float distToOrigin = Vector3.Distance(mouseWorldPos, Vector3.zero);
 
         foreach (OrbitalBody body in allBodies)
         {
@@ -94,7 +93,10 @@ public class CameraZoom : MonoBehaviour
 
             if (body.OrbitRadiusWorld > 0f)
             {
-                float ringDistance = Mathf.Abs(distToOrigin - body.OrbitRadiusWorld);
+                // Correção: distância medida a partir do CENTRO REAL daquela órbita (Sol para planetas, planeta para luas),
+                // não da origem fixa do mundo.
+                float distToCenter = Vector3.Distance(mouseWorldPos, body.OrbitCenterPosition);
+                float ringDistance = Mathf.Abs(distToCenter - body.OrbitRadiusWorld);
                 float ringTolerance = Mathf.Max(cam.orthographicSize * ringToleranceFactor, ringMinTolerance);
 
                 if (ringDistance < ringTolerance && ringDistance < closestScore)
@@ -110,6 +112,18 @@ public class CameraZoom : MonoBehaviour
 
     void HandleHover()
     {
+        // Enquanto travado seguindo um planeta, a seleção/hover fica desligada —
+        // só volta a funcionar quando o jogador arrastar a câmera (o que cancela o follow).
+        if (followTarget != null)
+        {
+            if (hoveredBody != null)
+            {
+                hoveredBody.SetHighlighted(false);
+                hoveredBody = null;
+            }
+            return;
+        }
+
         OrbitalBody closest = FindClosestBodyToMouse();
 
         if (closest != hoveredBody)
@@ -122,6 +136,8 @@ public class CameraZoom : MonoBehaviour
 
     void HandleClick()
     {
+        if (followTarget != null) return; // já travado, clique não faz nada novo por enquanto
+
         if (Input.GetMouseButtonDown(0))
         {
             OrbitalBody closest = FindClosestBodyToMouse();
@@ -134,6 +150,12 @@ public class CameraZoom : MonoBehaviour
 
     void FocusOnPlanet(OrbitalBody body)
     {
+        if (hoveredBody != null)
+        {
+            hoveredBody.SetHighlighted(false);
+            hoveredBody = null;
+        }
+
         followTarget = null;
 
         float focusZoom = referencePlanet != null
@@ -177,7 +199,7 @@ public class CameraZoom : MonoBehaviour
         {
             dragOrigin = GetMouseWorldPosition();
             isDragging = true;
-            followTarget = null;
+            followTarget = null; // arrastar cancela o lock, devolvendo o hover normal
             StopAllCoroutines();
             isTransitioning = false;
         }

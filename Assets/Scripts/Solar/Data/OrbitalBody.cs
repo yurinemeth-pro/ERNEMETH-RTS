@@ -11,22 +11,25 @@ public class OrbitalBody : MonoBehaviour
 
     [Header("Linha de órbita")]
     public float orbitLinePixelWidth = 2f;
-    public int orbitSegments = 200; // mais pontos = curva mais suave
+    public int orbitSegments = 200;
 
     [Header("Seleção (destaque)")]
     public float orbitHighlightPixelWidth = 5f;
-    public float highlightFadeSpeed = 4f; // maior = acende/apaga mais rápido
-    public float markerPixelSize = 30f;   // tamanho do círculo marcador na tela
+    public float highlightFadeSpeed = 4f;
+    public float markerPixelSize = 15f;
+    [Range(0f, 1f)] public float markerMaxOpacity = 0.5f;
 
     public float OrbitRadiusWorld { get; private set; }
+    public Vector3 OrbitCenterPosition => orbitCenter != null ? orbitCenter.position : Vector3.zero;
 
     private LineRenderer orbitLine;
     private LineRenderer highlightLine;
-    private LineRenderer marker;
+    private MeshRenderer markerRenderer;
+    private Material markerMaterial;
     private Camera mainCam;
     private Renderer rend;
     private bool isHighlighted;
-    private float highlightAmount; // 0 a 1, suavizado
+    private float highlightAmount;
     private OrbitingBodyData orbitData;
 
     void GenerateSphere(int resolution)
@@ -86,6 +89,52 @@ public class OrbitalBody : MonoBehaviour
         return line;
     }
 
+    Mesh BuildFilledCircleMesh(int segments)
+    {
+        Mesh mesh = new Mesh();
+
+        Vector3[] vertices = new Vector3[segments + 1];
+        int[] triangles = new int[segments * 3];
+
+        vertices[0] = Vector3.zero; // centro
+
+        for (int i = 0; i < segments; i++)
+        {
+            float angle = ((float)i / segments) * 360f * Mathf.Deg2Rad;
+            vertices[i + 1] = new Vector3(Mathf.Cos(angle), Mathf.Sin(angle), 0f) * 0.5f; // raio 0.5 (diâmetro 1)
+        }
+
+        for (int i = 0; i < segments; i++)
+        {
+            int current = i + 1;
+            int next = (i + 1) % segments + 1;
+
+            triangles[i * 3] = 0;
+            triangles[i * 3 + 1] = current;
+            triangles[i * 3 + 2] = next;
+        }
+
+        mesh.vertices = vertices;
+        mesh.triangles = triangles;
+        mesh.RecalculateNormals();
+
+        return mesh;
+    }
+
+    void CreateMarker()
+    {
+        GameObject obj = new GameObject(data.bodyName + "_Marker");
+        MeshFilter mf = obj.AddComponent<MeshFilter>();
+        markerRenderer = obj.AddComponent<MeshRenderer>();
+
+        mf.mesh = BuildFilledCircleMesh(40);
+
+        markerMaterial = new Material(Shader.Find("Sprites/Default"));
+        markerRenderer.material = markerMaterial;
+
+        markerRenderer.enabled = false;
+    }
+
     void Start()
     {
         GenerateSphere(data.sphereResolution);
@@ -117,8 +166,7 @@ public class OrbitalBody : MonoBehaviour
             transform.position = Vector3.zero;
         }
 
-        marker = CreateLineObject(data.bodyName + "_Marker");
-        marker.positionCount = 40;
+        CreateMarker();
 
         float diameter = settings.useRealisticScale
             ? data.realDiameterAU * settings.unitsPerAU
@@ -152,7 +200,6 @@ public class OrbitalBody : MonoBehaviour
             transform.position = centerPos + new Vector3(x, y, 0f);
         }
 
-        // Fade suave do destaque (acende e apaga gradualmente)
         float target = isHighlighted ? 1f : 0f;
         highlightAmount = Mathf.MoveTowards(highlightAmount, target, Time.deltaTime * highlightFadeSpeed);
 
@@ -164,7 +211,6 @@ public class OrbitalBody : MonoBehaviour
 
         if (mainCam == null) return;
 
-        // Linha de órbita normal
         if (orbitData != null && orbitLine != null)
         {
             UpdateCirclePoints(orbitLine, centerPos, OrbitRadiusWorld, orbitSegments);
@@ -177,7 +223,6 @@ public class OrbitalBody : MonoBehaviour
             orbitLine.endColor = lineColor;
         }
 
-        // Linha de órbita destacada (fade gradual junto com highlightAmount)
         if (highlightLine != null)
         {
             bool visible = highlightAmount > 0.001f;
@@ -198,25 +243,21 @@ public class OrbitalBody : MonoBehaviour
             }
         }
 
-        // Círculo marcador sobre o próprio planeta (tamanho constante na tela)
-        if (marker != null)
+        // Marcador circular preenchido, tamanho constante na tela
+        if (markerRenderer != null)
         {
             bool visible = highlightAmount > 0.001f;
-            marker.enabled = visible;
+            markerRenderer.enabled = visible;
 
             if (visible)
             {
-                float markerRadius = markerPixelSize * mainCam.orthographicSize * 0.002f;
-                UpdateCirclePoints(marker, transform.position, markerRadius, 40);
-
-                float mWidth = markerRadius * 0.15f;
-                marker.startWidth = mWidth;
-                marker.endWidth = mWidth;
+                float markerDiameter = markerPixelSize * mainCam.orthographicSize * 0.002f;
+                markerRenderer.transform.position = transform.position + new Vector3(0f, 0f, -1f); // ligeiramente à frente do planeta
+                markerRenderer.transform.localScale = Vector3.one * markerDiameter;
 
                 Color mColor = data.highlightColor;
-                mColor.a = highlightAmount;
-                marker.startColor = mColor;
-                marker.endColor = mColor;
+                mColor.a = highlightAmount * markerMaxOpacity;
+                markerMaterial.color = mColor;
             }
         }
     }
