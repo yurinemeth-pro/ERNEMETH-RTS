@@ -148,6 +148,9 @@ public class OrbitalBody : MonoBehaviour
         if (data is StarData starData && rend != null)
         {
             gameObject.AddComponent<StarGlow>().Initialize(starData, rend);
+            GameObject raysObj = new GameObject(data.bodyName + "_Rays");
+            raysObj.transform.SetParent(transform, false);
+            raysObj.AddComponent<SunRays>().Initialize(starData);
         }
 
         orbitData = data as OrbitingBodyData;

@@ -19,7 +19,7 @@ MonoBehaviour:
   sphereResolution: 64
   highlightColor: {r: 1, g: 0.7910179, b: 0, a: 1}
   rings: []
-  starColor: {r: 1, g: 0.8950324, b: 0.5518868, a: 1}
+  starColor: {r: 1, g: 0.90997016, b: 0.6273585, a: 1}
   starEmissionIntensity: 3
   starPulseSpeed: 0.5
   starPulseAmount: 0.15

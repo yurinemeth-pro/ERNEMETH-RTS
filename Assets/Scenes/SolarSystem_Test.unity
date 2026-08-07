@@ -1090,15 +1090,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StarfieldLayer
   starCount: 15000
-  minStarPixelSize: 1.5
-  maxStarPixelSize: 3
-  minBrightness: 0.1
-  maxBrightness: 0.8
+  minStarSize: 0.0015
+  maxStarSize: 0.004
+  minBrightness: 0.01
+  maxBrightness: 0.1
   starTint: {r: 1, g: 1, b: 1, a: 1}
   randomSeed: 12345
-  coverageMargin: 1.4
-  referenceOrthoSize: 250
+  coverageSafety: 1.3
   maxParallaxAtFullZoomOut: 0.08
+  referenceOrthoSizeForParallax: 4000
 --- !u!33 &1131518703
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -2304,7 +2304,7 @@ MonoBehaviour:
   startYear: 1989
   startMonth: 8
   startDay: 25
-  timeScale: 5000000
+  timeScale: 5000
 --- !u!4 &2029327208
 Transform:
   m_ObjectHideFlags: 0

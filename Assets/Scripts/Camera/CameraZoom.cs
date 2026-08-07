@@ -30,6 +30,7 @@ public class CameraZoom : MonoBehaviour
     private Vector3 dragOrigin;
     private bool isDragging;
     private Transform followTarget;
+    private OrbitalBody lockedBody;   // o corpo em que estamos travados agora (null = nenhum)
     private OrbitalBody hoveredBody;
 
     void Start()
@@ -72,7 +73,7 @@ public class CameraZoom : MonoBehaviour
         return cam.ScreenToWorldPoint(mouseScreenPos);
     }
 
-    OrbitalBody FindClosestBodyToMouse()
+    OrbitalBody FindClosestBodyToMouse(OrbitalBody exclude)
     {
         Vector3 mouseWorldPos = GetMouseWorldPosition();
         OrbitalBody[] allBodies = FindObjectsOfType<OrbitalBody>();
@@ -82,6 +83,8 @@ public class CameraZoom : MonoBehaviour
 
         foreach (OrbitalBody body in allBodies)
         {
+            if (body == exclude) continue; // pula o corpo travado — ele nunca conta pro hover/clique
+
             float bodyDistance = Vector3.Distance(mouseWorldPos, body.transform.position);
             float bodyTolerance = Mathf.Max(body.transform.localScale.x * bodyToleranceMultiplier, cam.orthographicSize * bodyMinTolerranceFactor);
 
@@ -93,8 +96,6 @@ public class CameraZoom : MonoBehaviour
 
             if (body.OrbitRadiusWorld > 0f)
             {
-                // Correção: distância medida a partir do CENTRO REAL daquela órbita (Sol para planetas, planeta para luas),
-                // não da origem fixa do mundo.
                 float distToCenter = Vector3.Distance(mouseWorldPos, body.OrbitCenterPosition);
                 float ringDistance = Mathf.Abs(distToCenter - body.OrbitRadiusWorld);
                 float ringTolerance = Mathf.Max(cam.orthographicSize * ringToleranceFactor, ringMinTolerance);
@@ -112,19 +113,7 @@ public class CameraZoom : MonoBehaviour
 
     void HandleHover()
     {
-        // Enquanto travado seguindo um planeta, a seleção/hover fica desligada —
-        // só volta a funcionar quando o jogador arrastar a câmera (o que cancela o follow).
-        if (followTarget != null)
-        {
-            if (hoveredBody != null)
-            {
-                hoveredBody.SetHighlighted(false);
-                hoveredBody = null;
-            }
-            return;
-        }
-
-        OrbitalBody closest = FindClosestBodyToMouse();
+        OrbitalBody closest = FindClosestBodyToMouse(lockedBody);
 
         if (closest != hoveredBody)
         {
@@ -136,11 +125,9 @@ public class CameraZoom : MonoBehaviour
 
     void HandleClick()
     {
-        if (followTarget != null) return; // já travado, clique não faz nada novo por enquanto
-
         if (Input.GetMouseButtonDown(0))
         {
-            OrbitalBody closest = FindClosestBodyToMouse();
+            OrbitalBody closest = FindClosestBodyToMouse(lockedBody);
             if (closest != null)
             {
                 FocusOnPlanet(closest);
@@ -156,6 +143,7 @@ public class CameraZoom : MonoBehaviour
             hoveredBody = null;
         }
 
+        lockedBody = body;
         followTarget = null;
 
         float focusZoom = referencePlanet != null
@@ -199,7 +187,8 @@ public class CameraZoom : MonoBehaviour
         {
             dragOrigin = GetMouseWorldPosition();
             isDragging = true;
-            followTarget = null; // arrastar cancela o lock, devolvendo o hover normal
+            followTarget = null;
+            lockedBody = null; // solta o travamento — hover/clique voltam a valer pra TODOS os corpos
             StopAllCoroutines();
             isTransitioning = false;
         }

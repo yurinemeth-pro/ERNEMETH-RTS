@@ -14,7 +14,6 @@ Material:
   m_ValidKeywords:
   - _ALPHABLEND_ON
   - _EMISSION
-  - _GLOSSYREFLECTIONS_OFF
   - _SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A
   m_InvalidKeywords: []
   m_LightmapFlags: 2
@@ -24,7 +23,7 @@ Material:
   stringTagMap:
     RenderType: Transparent
   disabledShaderPasses: []
-  m_LockedProperties: 
+  m_LockedProperties: :m_LightmapFlags
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
@@ -72,8 +71,8 @@ Material:
     - _DstBlend: 10
     - _GlossMapScale: 0
     - _Glossiness: 1
-    - _GlossyReflections: 0
-    - _Metallic: 0
+    - _GlossyReflections: 1
+    - _Metallic: 1
     - _Mode: 2
     - _OcclusionStrength: 1
     - _Parallax: 0.02

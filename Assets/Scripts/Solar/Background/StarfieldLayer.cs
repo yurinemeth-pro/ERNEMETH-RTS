@@ -5,35 +5,27 @@ public class StarfieldLayer : MonoBehaviour
 {
     [Header("Geração de estrelas (aleatória, gerada 1 única vez)")]
     public int starCount = 1500;
-    public float minStarPixelSize = 1.5f;
-    public float maxStarPixelSize = 5f;
+    public float minStarSize = 0.0015f; // tamanho NORMALIZADO (fração do campo, não pixels)
+    public float maxStarSize = 0.004f;
     public float minBrightness = 0.4f;
     public float maxBrightness = 1f;
     public Color starTint = Color.white;
     public int randomSeed = 12345;
 
-    [Header("Cobertura do campo (calculada automaticamente)")]
-    public float coverageMargin = 1.4f; // folga extra além do necessário pra cobrir a tela no maior zoom out
-
-    [Header("Referência de escala (deve bater com o Max Zoom da câmera)")]
-    public float referenceOrthoSize = 4000f;
+    [Header("Cobertura (recalculada TODO frame — sempre cobre a tela, sem depender de valor fixo)")]
+    public float coverageSafety = 1.3f;
 
     [Header("Paralaxe (0 = travado na câmera, cresce com o zoom out)")]
     [Range(0f, 0.3f)] public float maxParallaxAtFullZoomOut = 0.08f;
+    public float referenceOrthoSizeForParallax = 4000f; // só calibra a INTENSIDADE do paralaxe, não a cobertura
 
     private Camera mainCam;
     private Transform camTransform;
-    private float fieldHalfSize;
 
     void Start()
     {
         mainCam = Camera.main;
         camTransform = mainCam.transform;
-
-        // Cobertura garantida do campo, considerando a proporção da tela (aspect)
-        float aspect = Mathf.Max(mainCam.aspect, 1f);
-        fieldHalfSize = referenceOrthoSize * aspect * coverageMargin;
-
         BuildStarMesh();
     }
 
@@ -50,14 +42,12 @@ public class StarfieldLayer : MonoBehaviour
                 Vector2 p = new Vector2(x, y) - center;
                 float dist = p.magnitude / maxDist;
 
-                // Núcleo brilhante central (queda suave)
                 float core = Mathf.Clamp01(1f - dist * 3f);
                 core = core * core;
 
-                // Raios em 4 direções (cruz), mais finos quanto mais longe do centro
                 float angle = Mathf.Atan2(p.y, p.x);
-                float rayPattern = Mathf.Abs(Mathf.Sin(angle * 2f)); // pico nas 4 direções cardeais
-                float rayShape = Mathf.Pow(rayPattern, 24f); // espinhos finos, não uma cruz grossa
+                float rayPattern = Mathf.Abs(Mathf.Sin(angle * 2f));
+                float rayShape = Mathf.Pow(rayPattern, 24f);
                 float rayFalloff = Mathf.Clamp01(1f - dist);
                 float rays = rayShape * rayFalloff * rayFalloff;
 
@@ -77,6 +67,10 @@ public class StarfieldLayer : MonoBehaviour
         Random.State previousState = Random.state;
         Random.InitState(randomSeed);
 
+        // Campo NORMALIZADO: metade do tamanho = 1 (unidade abstrata).
+        // A cobertura de tela de verdade é resolvida no LateUpdate, escalando o objeto inteiro.
+        const float NORMALIZED_HALF = 1f;
+
         Vector3[] vertices = new Vector3[starCount * 4];
         Vector2[] uv = new Vector2[starCount * 4];
         int[] triangles = new int[starCount * 6];
@@ -85,13 +79,13 @@ public class StarfieldLayer : MonoBehaviour
         for (int i = 0; i < starCount; i++)
         {
             Vector2 pos = new Vector2(
-                Random.Range(-fieldHalfSize, fieldHalfSize),
-                Random.Range(-fieldHalfSize, fieldHalfSize)
+                Random.Range(-NORMALIZED_HALF, NORMALIZED_HALF),
+                Random.Range(-NORMALIZED_HALF, NORMALIZED_HALF)
             );
 
-            float size = Random.Range(minStarPixelSize, maxStarPixelSize) * 0.5f;
+            float size = Random.Range(minStarSize, maxStarSize);
             float brightness = Random.Range(minBrightness, maxBrightness);
-            float rot = Random.Range(0f, Mathf.PI * 2f); // rotação própria, evita padrão repetido
+            float rot = Random.Range(0f, Mathf.PI * 2f);
 
             Color c = starTint * brightness;
             c.a = 1f;
@@ -138,14 +132,13 @@ public class StarfieldLayer : MonoBehaviour
 
     void LateUpdate()
     {
-        if (camTransform == null) return;
+        if (camTransform == null || mainCam == null) return;
 
-        // Escala: cancela matematicamente a mudança de tamanho aparente com o zoom
-        float scale = mainCam.orthographicSize / referenceOrthoSize;
-        transform.localScale = Vector3.one * scale;
+        // Cobertura recalculada com o zoom e a proporção de tela ATUAIS — nunca fica desatualizada
+        float requiredHalfSize = mainCam.orthographicSize * Mathf.Max(mainCam.aspect, 1f) * coverageSafety;
+        transform.localScale = Vector3.one * requiredHalfSize;
 
-        // Paralaxe: quanto mais zoom out, mais a camada "atrasa" em relação à câmera (efeito sutil de profundidade)
-        float zoomRatio = Mathf.Clamp01(mainCam.orthographicSize / referenceOrthoSize);
+        float zoomRatio = Mathf.Clamp01(mainCam.orthographicSize / referenceOrthoSizeForParallax);
         float parallaxAmount = zoomRatio * maxParallaxAtFullZoomOut;
 
         Vector3 camPos = camTransform.position;
